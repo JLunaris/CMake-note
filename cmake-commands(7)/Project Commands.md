@@ -32,6 +32,21 @@ add_executable(<name> <options>... <sources>...)
 
 - `sources`：如果源文件在稍后使用`target_sources()`指令给出，则源文件可以省略。
 
+# add_subdirectory
+
+将==子目录==添加到构建中。
+
+```
+add_subdirectory(source_dir [binary_dir] [EXCLUDE_FROM_ALL] [SYSTEM])
+```
+
+`source_dir`指定源目录，其中包含`CMakeLists.txt`和代码文件。它常常是**相对路径**（==典型用法==），此时会根据当前目录进行求值(evaluate)，也可以是**绝对路径**。
+
+`binary_dir`指定**用于存放输出文件的目录**。如果它是相对路径，则会根据当前的**输出目录**进行求值，也可以是绝对路径。如果未指定，则会使用`source_dir`的值（==典型用法==）。
+
+`source_dir`中的`CMakeLists.txt`文件会**立即**被 CMake 处理，然后才处理当前输入文件中`add_subdirectory`之后的命令。
+
+
 # add_compile_definitions
 
 向源文件的编译过程添加==预处理定义==。
@@ -47,19 +62,4 @@ add_compile_definitions(QT_NO_DEBUG_OUTPUT)
 ```
 
 上述代码向源文件的编译过程添加了一个宏定义`QT_NO_DEBUG_OUTPUT`。
-
-# add_subdirectory
-
-将==子目录==添加到构建中。
-
-```
-add_subdirectory(source_dir [binary_dir] [EXCLUDE_FROM_ALL] [SYSTEM])
-```
-
-`source_dir`指定源目录，其中包含`CMakeLists.txt`和代码文件。它常常是**相对路径**（==典型用法==），此时会根据当前目录进行求值(evaluate)，也可以是**绝对路径**。
-
-`binary_dir`指定**用于存放输出文件的目录**。如果它是相对路径，则会根据当前的**输出目录**进行求值，也可以是绝对路径。如果未指定，则会使用`source_dir`的值（==典型用法==）。
-
-`source_dir`中的`CMakeLists.txt`文件会**立即**被 CMake 处理，然后才处理当前输入文件中`add_subdirectory`之后的命令。
-
 
