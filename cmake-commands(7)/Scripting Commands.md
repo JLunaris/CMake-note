@@ -114,17 +114,13 @@ endif()
 
 判断名为`<target-name>`的目标（target）是否存在。目标（target）可以由[`add_executable()`](https://cmake.org/cmake/help/latest/command/add_executable.html#command:add_executable "add_executable")、[`add_library()`](https://cmake.org/cmake/help/latest/command/add_library.html#command:add_library "add_library")或[`add_custom_target()`](https://cmake.org/cmake/help/latest/command/add_custom_target.html#command:add_custom_target "add_custom_target")创建。
 
-##### `if(DEFINED <名称>)`
+##### `if(DEFINED <名称>|ENV{<名称>}|CACHE{<名称>})`
 
-具体格式：
-```cmake
-if(DEFINED <名称>)
-if(DEFINED ENV{<名称>})
-```
+如果定义了名为`<名称>`的==变量/环境变量/缓存变量==，则为真。
 
-如果定义了名为`<名称>`的==变量/环境变量==，则为真。
-
-注意：宏实参不是变量。
+注意：
+1. 宏实参不是变量。
+2. 无法直接测试`<name>`是否是非缓存变量。对于表达式`if(DEFINED someName)`，在`someName`作为**缓存变量**或**非缓存变量**存在时都返回真。相比之下，表达式`if(DEFINED CACHE{someName})`仅在`someName`作为**缓存变量**存在时才返回真。如果你需要判断一个非缓存变量是否存在，需要同时使用这两个表达式：`if(DEFINED someName AND NOT DEFINED CACHE{someName})`
 
 ##### `if(<变量|字符串> IN_LIST <变量>)`
 

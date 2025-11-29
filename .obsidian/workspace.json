@@ -8,7 +8,7 @@
         "type": "tabs",
         "children": [
           {
-            "id": "38f1781469615030",
+            "id": "e9495c2a1cd41ea0",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -182,10 +182,11 @@
   },
   "active": "982566943007c254",
   "lastOpenFiles": [
-    "cmake-buildsystem(7).md",
-    "cmake-commands(7)/Scripting Commands.md",
-    "cmake-commands(7)/Project Commands.md",
     "cmake-variables(7).md",
+    "cmake-language(7).md",
+    "cmake-commands(7)/Scripting Commands.md",
+    "cmake-buildsystem(7).md",
+    "cmake-commands(7)/Project Commands.md",
     "cmake-buildsystem(7)",
     "CMAKE_PROJECT_NAME.md",
     "cmake-variables(7)/CMake Variables.md",
