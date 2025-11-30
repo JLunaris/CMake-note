@@ -54,3 +54,19 @@ The [`cmake-variables(7)`](https://cmake.org/cmake/help/latest/manual/cmake-var
 - 查看：使用[`cmake -E environment`](https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-E-arg-environment)显示当前所有环境变量。
 
 The [`cmake-env-variables(7)`](https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html#manual:cmake-env-variables\(7\) "cmake-env-variables(7)") manual documents environment variables that have special meaning to CMake.
+
+# 列表
+
+尽管 CMake 中所有的值都存储为**字符串**，但在某些上下文中，字符串会被视为**列表**（例如在求值[Unquoted Argument](https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#unquoted-argument)时）。此时，一个字符串会==以`;`为分隔符==被分割为多个列表元素。但当`;`位于未闭合的`[]`中的时（如==`[a;b;c]`==），不会被视为分隔符；转义序列==`\;`==中的`;`也不会被视为分隔符。
+
+列表的本质是==以`;`分隔各元素的字符串==。例如，`set()`命令将多个值以**列表**的形式存储到目标变量：
+
+```
+set(srcs a.c b.c c.c)  # 将变量 srcs 设置为 "a.c;b.c;c.c"
+```
+
+列表适用于简单的场景（如“源文件列表”），不应该用于复杂的数据处理任务。大多数构造列表的命令不会对列表元素中的`;`字符进行转义，因此嵌套列表会被扁平化：
+
+```
+set(x a "b;c")  # 将 x 设置为 "a;b;c"，而非 "a;b\;c"
+```

@@ -34,6 +34,48 @@ find_package(<PackageName> [<version>] [EXACT] [REQUIRED] [COMPONENTS <component
 `EXACT`选项表示指定的版本必须**完全匹配**。该选项不能与 range version 一起使用。
 
 
+# set
+
+将一个**普通变量**、**环境变量**或**缓存项**设置为给定的值。有关变量的说明见[[cmake-language(7)]]。
+
+本小节的所有命令格式中，占位符 ==`<值>...`== 表示该位置可以接受**零个或多个实参**。如果提供多个实参，它们会被连成一个[semicolon-separated list](https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#cmake-language-lists)，以形成要 set 的实际变量值。
+
+### 设置普通变量
+
+```
+set(<变量> <值>... [PARENT_SCOPE])
+```
+
+在当前**函数作用域**或**目录作用域**中 set 或 unset `<变量>`：
+- 如果提供了至少一个`<值>`，则将变量设置为该值。
+- 如果没有提供值，则 unset 该变量。这等价于[`unset(<变量>)`](https://cmake.org/cmake/help/latest/command/unset.html#command:unset "unset")。
+
+如果指定了`[PARENT_SCOPE]`，则变量会被设置到当前作用域的**上一层作用域**（即父目录/外层调用函数/外层作用域）中。变量在**当前作用域**中的先前状态保持不变（如果它之前是未定义的，它仍然未定义；如果它之前有值，它仍然保持那个值）。
+
+> 创建作用域的方式有 3 种：
+> ①每个==新目录==会创建一个新作用域。
+> ②每个==[`function()`](https://cmake.org/cmake/help/latest/command/function.html#command:function "function")命令==会创建一个新作用域。
+> ③可以通过==[`block()`](https://cmake.org/cmake/help/latest/command/block.html#command:block "block")命令==显式创建作用域。
+
+要更新父作用域的变量，除了使用`set()`命令的`[PARENT_SCOPE]`选项外，还可以使用[`block()`](https://cmake.org/cmake/help/latest/command/block.html#command:block "block(propagate)")命令和[`return()`](https://cmake.org/cmake/help/latest/command/return.html#command:return "return(propagate)")命令的`[PROPAGATE]`选项。
+
+> 注意：求值**变量引用**（`${VAR}`）时，CMake 会先查找具有该名称的**普通变量**；如果不存在，CMake 将查找具有该名称的**缓存变量**。因此，unset 一个普通变量可能会暴露出一个之前被隐藏的缓存变量。为了强制`${VAR}`返回空字符串，可使用`set(<变量> "")`，这会清空该普通变量但保留其“defined”状态。
+
+### 设置环境变量
+
+```
+set(ENV{<变量>} [<值>])
+```
+
+将一个[`环境变量`](https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html#manual:cmake-env-variables\(7\) "cmake-env-variables(7)")设置为给定的值。之后的`$ENV{<变量>}`都会返回这个新的值。
+
+此命令**只影响当前 CMake 进程**，不会影响调用 CMake 的那个外部进程，更不会影响系统环境变量，也不会影响后续的构建或测试进程的环境。
+
+如果在`ENV{<变量>}`的后面没有给出任何值，或者`<值>`是空字符串，则该命令会清空该环境变量的已有值。
+
+### 设置缓存项
+
+略
 # set_property
 
 ```
