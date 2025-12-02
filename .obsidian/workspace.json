@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "cmake-language(7).md",
+                "file": "cmake-commands(7)/Project Commands.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "cmake-language(7)"
+              "title": "Project Commands"
             }
           }
         ]
@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "cmake-language(7).md",
+                "file": "cmake-commands(7)/Project Commands.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "cmake-language(7) 的大纲"
+              "title": "Project Commands 的大纲"
             }
           },
           {
@@ -183,8 +183,8 @@
   "active": "982566943007c254",
   "lastOpenFiles": [
     "cmake-commands(7)/Scripting Commands.md",
-    "cmake-language(7).md",
     "cmake-commands(7)/Project Commands.md",
+    "cmake-language(7).md",
     "cmake-variables(7).md",
     "cmake-buildsystem(7).md",
     "cmake-buildsystem(7)",

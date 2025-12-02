@@ -63,3 +63,32 @@ add_compile_definitions(QT_NO_DEBUG_OUTPUT)
 
 上述代码向源文件的编译过程添加了一个宏定义`QT_NO_DEBUG_OUTPUT`。
 
+# target_include_directories
+
+```
+target_include_directories(<target> [SYSTEM]
+  <INTERFACE|PUBLIC|PRIVATE> [items1...]
+  [<INTERFACE|PUBLIC|PRIVATE> [items2...] ...])
+```
+
+指定在编译`<target>`时==要使用的 include 目录==。
+
+`<INTERFACE|PUBLIC|PRIVATE>`必不可少，用于指定后续实参的[作用域](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-command-scope)：
+- `PRIVATE`和`PUBLIC`的`item`会被写入`<target>`的[`INCLUDE_DIRECTORIES`](https://cmake.org/cmake/help/latest/prop_tgt/INCLUDE_DIRECTORIES.html#prop_tgt:INCLUDE_DIRECTORIES "INCLUDE_DIRECTORIES")属性
+- `PUBLIC`和`INTERFACE`的`item`会被写入`<target>`的[`INTERFACE_INCLUDE_DIRECTORIES`](https://cmake.org/cmake/help/latest/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_INCLUDE_DIRECTORIES "INTERFACE_INCLUDE_DIRECTORIES")属性。
+
+后面的实参指定 include 目录。
+
+指定的 include 目录可以是**绝对路径**，也可以是**相对路径**。==相对路径将被解释为==相对于当前源目录（即==[`CMAKE_CURRENT_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_CURRENT_SOURCE_DIR.html#variable:CMAKE_CURRENT_SOURCE_DIR "CMAKE_CURRENT_SOURCE_DIR")==），并在存入关联目标属性之前转换为绝对路径。
+
+对一个`<target>`多次调用该命令，会按顺序依次**追加**这些`item`。
+
+---
+
+如果指定了`SYSTEM`，在某些平台上 CMake 会通知编译器：这些目录是**系统include目录**。这可能会带来以下效果（取决于编译器）：比如抑制警告，或者在依赖分析中跳过目录中的头文件。此外，无论指定了怎样的顺序，**系统include目录**都会在普通include目录**之后**被搜索。
+
+如果`SYSTEM`与`PUBLIC`或`INTERFACE`一起使用，那么这样的目录还会被写入`<target>`的[`INTERFACE_SYSTEM_INCLUDE_DIRECTORIES`](https://cmake.org/cmake/help/latest/prop_tgt/INTERFACE_SYSTEM_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "INTERFACE_SYSTEM_INCLUDE_DIRECTORIES")属性。
+
+---
+
+传递给`target_include_directories`的实参可以使用形如`$<...>`的生成器表达式，见[`cmake-generator-expressions(7)`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions\(7\) "cmake-generator-expressions(7)")。
