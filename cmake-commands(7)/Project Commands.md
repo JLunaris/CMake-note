@@ -32,12 +32,41 @@ add_executable(<name> <options>... <sources>...)
 
 - `sources`：如果源文件在稍后使用`target_sources()`指令给出，则源文件可以省略。
 
+# add_library
+
+使用指定的源文件，向项目添加一个库。
+
+### Normal Libraries
+
+```
+add_library(<名称> [<类型>] <源文件>...)
+```
+
+添加一个名为`<名称>`的库目标，该库将由命令中列出的`<源文件>...`构建。
+
+可选的`<类型>`用于指定要创建的库类型：
+- `STATIC`：[Static Library](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#static-libraries)：==an archive of object files for use when linking other targets==.
+- `SHARED`：[Shared Library](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#shared-libraries)：==一个动态库，可被其他目标链接，并在运行时加载==。
+- `MODULE`：[Module Library](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#module-libraries)：==一个插件（plugin），可能无法被其他目标链接，但可以在运行时使用类似`dlopen`的方式动态加载==。
+如果未指定`<类型>`，则默认为`STATIC`或`SHARED`，具体取决于变量[`BUILD_SHARED_LIBS`](https://cmake.org/cmake/help/latest/variable/BUILD_SHARED_LIBS.html#variable:BUILD_SHARED_LIBS "BUILD_SHARED_LIBS")的取值。
+
+`<名称>`是逻辑目标名，必须在整个项目中全局唯一。实际构建出的库的文件名由平台规则决定（如==`lib<名称>.a`==或==`<名称>.lib`==），要修改最终文件名的`<名称>`部分，见目标属性[`OUTPUT_NAME`](https://cmake.org/cmake/help/latest/prop_tgt/OUTPUT_NAME.html#prop_tgt:OUTPUT_NAME "OUTPUT_NAME")。
+
+`<源文件>...`可以省略——如果它们在之后通过[`target_sources()`](https://cmake.org/cmake/help/latest/command/target_sources.html#command:target_sources "target_sources")添加。
+
+---
+
+1. 如果一个库不导出任何符号，则不能将其声明为`SHARED`库。例如，一个 Windows resource DLL 或一个不导出任何 unmanaged symbols 的 managed C++/CLI DLL 就需要被声明为`MODULE`库。这是因为==在 Windows 上，CMake 期望`SHARED`库必须具有对应的导入库（import library）==。
+
+2. 默认情况下，库文件会被创建在构建树中**与该 add_library 命令所在的源码树目录相对应**的目录下。要修改该位置，见[`ARCHIVE_OUTPUT_DIRECTORY`](https://cmake.org/cmake/help/latest/prop_tgt/ARCHIVE_OUTPUT_DIRECTORY.html#prop_tgt:ARCHIVE_OUTPUT_DIRECTORY "ARCHIVE_OUTPUT_DIRECTORY")、[`LIBRARY_OUTPUT_DIRECTORY`](https://cmake.org/cmake/help/latest/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html#prop_tgt:LIBRARY_OUTPUT_DIRECTORY "LIBRARY_OUTPUT_DIRECTORY")、[`RUNTIME_OUTPUT_DIRECTORY`](https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html#prop_tgt:RUNTIME_OUTPUT_DIRECTORY "RUNTIME_OUTPUT_DIRECTORY")。
+
+
 # add_subdirectory
 
 将==子目录==添加到构建中。
 
 ```
-add_subdirectory(source_dir [binary_dir] [EXCLUDE_FROM_ALL] [SYSTEM])
+add_subdirectory(source_dir [binary_dir])
 ```
 
 `source_dir`指定源目录，其中包含`CMakeLists.txt`和代码文件。它常常是**相对路径**（==典型用法==），此时会根据当前目录进行求值(evaluate)，也可以是**绝对路径**。
@@ -92,3 +121,34 @@ target_include_directories(<target> [SYSTEM]
 ---
 
 传递给`target_include_directories`的实参可以使用形如`$<...>`的生成器表达式，见[`cmake-generator-expressions(7)`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions\(7\) "cmake-generator-expressions(7)")。
+
+# target_link_libraries
+
+指定在链接**目标**和/或**其依赖目标**时要使用的库或标志。链接库目标的 [Usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements) 会被传递。一个目标的依赖项的 [Usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements) 会影响目标自身源文件的编译。换句话说：
+
+> 假设你有一个目标`A`，它通过`target_link_libraries(A libX)`链接了库`libX`。`libX`可能有自己的 usage requirements，那么这些 usage requirements 会传递给`A`，影响`A`的编译。
+
+### 概述
+
+该命令有几种形式，详见下面的各小节。它们的一般形式为：
+
+```
+target_link_libraries(<目标> ... <item>... ...)
+```
+
+`<目标>`必须已被创建。如果策略[`CMP0079`](https://cmake.org/cmake/help/latest/policy/CMP0079.html#policy:CMP0079 "CMP0079")未设置为`NEW`，则`<目标>`必须是在**当前目录**中创建的。对同一个`<目标>`的多次调用会按调用顺序将`<item>`追加到该目标的链接列表中。
+
+`<item>`可以是：
+
+- ==A library target name==：
+- ==A full path to a library file==：
+- 直接库名
+- 链接标志
+- 生成器表达式
+
+
+
+
+
+
+

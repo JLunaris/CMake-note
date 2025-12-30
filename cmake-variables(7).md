@@ -25,6 +25,19 @@ https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 
 当项目第一次创建新的构建目录时，这个变量会在第一个调用`project()`或`enable_language()`命令时初始化。如果设置了环境变量[`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/envvar/CMAKE_BUILD_TYPE.html#envvar:CMAKE_BUILD_TYPE "CMAKE_BUILD_TYPE")，则会使用该环境变量的值。否则，当启用某种语言时，会选择一个与工具链相关的默认值。默认值通常是一个空字符串，但这通常并不是理想的做法，因为通常使用标准构建类型之一会更合适。
 
+### CMAKE_PREFIX_PATH
+
+用分号分隔的目录列表（[[cmake-language(7)#列表]]），用于指定[`find_package()`](https://cmake.org/cmake/help/latest/command/find_package.html#command:find_package "find_package"), [`find_program()`](https://cmake.org/cmake/help/latest/command/find_program.html#command:find_program "find_program"), [`find_library()`](https://cmake.org/cmake/help/latest/command/find_library.html#command:find_library "find_library"), [`find_file()`](https://cmake.org/cmake/help/latest/command/find_file.html#command:find_file "find_file"), [`find_path()`](https://cmake.org/cmake/help/latest/command/find_path.html#command:find_path "find_path")命令的搜索**前缀**。这些命令会按照其自身文档中的说明，==在这些前缀后面自动拼接合适的子目录==（如`bin`、`lib`、`include`）。例如：
+
+```
+/opt/mylib + lib → /opt/mylib/lib
+/opt/mylib + bin → /opt/mylib/bin
+```
+
+默认情况下该变量为空。通常由项目自行设置。
+
+另外还存在一个同名的环境变量[`CMAKE_PREFIX_PATH`](https://cmake.org/cmake/help/latest/envvar/CMAKE_PREFIX_PATH.html#envvar:CMAKE_PREFIX_PATH "CMAKE_PREFIX_PATH")，它会作为额外的搜索前缀列表被使用。
+
 # Variables that Describe the System
 
 ### 操作系统判定

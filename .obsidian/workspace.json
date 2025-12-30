@@ -182,10 +182,10 @@
   },
   "active": "982566943007c254",
   "lastOpenFiles": [
+    "cmake-variables(7).md",
+    "cmake-language(7).md",
     "cmake-commands(7)/Scripting Commands.md",
     "cmake-commands(7)/Project Commands.md",
-    "cmake-language(7).md",
-    "cmake-variables(7).md",
     "cmake-buildsystem(7).md",
     "cmake-buildsystem(7)",
     "CMAKE_PROJECT_NAME.md",
