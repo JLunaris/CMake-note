@@ -124,7 +124,7 @@ target_include_directories(<target> [SYSTEM]
 
 # target_link_libraries
 
-指定在链接**目标**和/或**其依赖目标**时要使用的库或标志。链接库目标的 [Usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements) 会被传递。一个目标的依赖项的 [Usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements) 会影响目标自身源文件的编译。换句话说：
+指定在链接**目标**和/或**其依赖目标**时要使用的库。链接库目标的 [Usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements) 会被传递。一个目标的依赖项的 [Usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements) 会影响目标自身源文件的编译。换句话说：
 
 > 假设你有一个目标`A`，它通过`target_link_libraries(A libX)`链接了库`libX`。`libX`可能有自己的 usage requirements，那么这些 usage requirements 会传递给`A`，影响`A`的编译。
 
@@ -136,19 +136,42 @@ target_include_directories(<target> [SYSTEM]
 target_link_libraries(<目标> ... <item>... ...)
 ```
 
-`<目标>`必须已被创建。如果策略[`CMP0079`](https://cmake.org/cmake/help/latest/policy/CMP0079.html#policy:CMP0079 "CMP0079")未设置为`NEW`，则`<目标>`必须是在**当前目录**中创建的。对同一个`<目标>`的多次调用会按调用顺序将`<item>`追加到该目标的链接列表中。
+`<目标>`必须已被创建（使用[`add_executable()`](https://cmake.org/cmake/help/latest/command/add_executable.html#command:add_executable "add_executable")或[`add_library()`](https://cmake.org/cmake/help/latest/command/add_library.html#command:add_library "add_library")等创建）。如果策略[`CMP0079`](https://cmake.org/cmake/help/latest/policy/CMP0079.html#policy:CMP0079 "CMP0079")未设置为`NEW`，则`<目标>`必须是在**当前目录**中创建的。对同一个`<目标>`的多次调用会按调用顺序将`<item>`追加到该目标的链接列表中。
 
 `<item>`可以是：
 
-- ==A library target name==：
-- ==A full path to a library file==：
-- 直接库名
-- 链接标志
-- 生成器表达式
+- **库目标名**：==库目标==必须通过**项目内的**[`add_library()`](https://cmake.org/cmake/help/latest/command/add_library.html#command:add_library "add_library")命令创建，或作为一个[导入库](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets)。如果库目标是在项目中创建的，==构建系统会确保在`<目标>`链接库目标之前，库目标是最新的==。
 
+  生成的链接命令将含有与该库目标关联的可链接库文件的完整路径；但如果一个[导入库](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets)设置了[`IMPORTED_NO_SONAME`](https://cmake.org/cmake/help/latest/prop_tgt/IMPORTED_NO_SONAME.html#prop_tgt:IMPORTED_NO_SONAME "IMPORTED_NO_SONAME")目标属性，CMake 可能会让链接器去搜索该库，而不是使用完整路径（例如`/usr/lib/libfoo.so`会变成`-lfoo`）。
+  
+  ==如果库文件发生变化，构建系统会重新链接`<目标>`。==
 
+- **库文件的完整路径**：生成的链接命令通常会保留库文件的完整路径；但有些情况下，CMake 可能会让链接器去搜索库（例如`/usr/lib/libfoo.so`会变成`-lfoo`），比如当`SHARED`库被检测到没有`SONAME`字段时。==如果库文件发生变化，构建系统会重新链接`<目标>`。==
 
+- **直接库名**：生成的链接命令会让链接器搜索该库（例如`foo`会变成`-lfoo`或`foo.lib`）。库名/链接标志会被视为命令行字符串片段。
 
+- **生成器表达式**：略
 
+包含`::`的`<item>`（例如==`Foo::Bar`==）被认定为[导入](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets)或[别名](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#alias-targets)库目标名称，如果不存在这样的目标，会导致错误。见策略[`CMP0028`](https://cmake.org/cmake/help/latest/policy/CMP0028.html#policy:CMP0028 "CMP0028")。
 
+### Libraries for a Target and/or its Dependents
 
+```
+target_link_libraries(<target>
+                      <PRIVATE|PUBLIC|INTERFACE> <item>...
+                     [<PRIVATE|PUBLIC|INTERFACE> <item>...]...)
+```
+
+`PUBLIC`/`PRIVATE`/`INTERFACE`[作用域](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-command-scope)关键字可以在一条命令中同时指定**目标自身需要链接的库**，以及**这些库是否成为链接接口的一部分**。
+
+- 位于`PUBLIC`后的`<item>`：会被链接到`<target>`，也会成为链接接口的一部分。
+- 位于`PRIVATE`后的`<item>`：会被链接到`<target>`，但不会成为链接接口的一部分。
+- 位于`INTERFACE`后的`<item>`：只会成为链接接口的一部分，不会用于链接`<target>`。
+
+### Libraries for both a Target and its Dependents
+
+```
+target_link_libraries(<target> <item>...)
+```
+
+使用这个形式时，库依赖默认是**传递的**。也就是说，当此目标被链接到另一个目标时，链接到此目标的库也将出现在另一目标的链接命令行中。

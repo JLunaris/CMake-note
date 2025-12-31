@@ -16,6 +16,17 @@ https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 
 要获取当前目录或更上层目录中最近一次`project()`调用的名称，请参阅`PROJECT_NAME`变量。
 
+### CMAKE_CURRENT_SOURCE_DIR
+
+cmake 当前正在处理的源目录的完整路径。
+
+当在[`cmake -P`](https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-P)脚本模式运行时，CMake 会把以下变量设置为当前工作目录：
+- [`CMAKE_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_BINARY_DIR.html#variable:CMAKE_BINARY_DIR "CMAKE_BINARY_DIR")
+- [`CMAKE_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_SOURCE_DIR.html#variable:CMAKE_SOURCE_DIR "CMAKE_SOURCE_DIR")
+- [`CMAKE_CURRENT_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_CURRENT_BINARY_DIR.html#variable:CMAKE_CURRENT_BINARY_DIR "CMAKE_CURRENT_BINARY_DIR")
+- `CMAKE_CURRENT_SOURCE_DIR`
+
+对`CMAKE_CURRENT_SOURCE_DIR`进行修改会产生**未定义行为**。
 
 # Variables that Change Behavior
 
