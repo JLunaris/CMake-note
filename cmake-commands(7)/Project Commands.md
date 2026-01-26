@@ -81,7 +81,7 @@ add_library(<名称> OBJECT <源文件>...)
 
 添加一个[Object Library](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#object-libraries)：==只编译源文件，而不把编译后生成的对象文件打包或链接成真正的库==。
 
-由`add_library()`或`add_executable()`创建的其他目标，可以使用[`$<TARGET_OBJECTS:objlib>`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#genex:TARGET_OBJECTS "TARGET_OBJECTS")格式的表达式引用这些对象，将其作为源文件，其中`objlib`是 object library 的名称。例如：
+由`add_library()`或`add_executable()`创建的其他目标，==可以使用[`$<TARGET_OBJECTS:objlib>`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#genex:TARGET_OBJECTS "TARGET_OBJECTS")格式的表达式引用这些对象，将其作为源文件==，其中`objlib`是 object library 的名称。例如：
 
 ```
 add_library(... $<TARGET_OBJECTS:objlib> ...)
