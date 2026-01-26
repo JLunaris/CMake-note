@@ -260,3 +260,19 @@ endif()
 
 更多细节见[cmake_path(COMPARE)](https://cmake.org/cmake/help/latest/command/cmake_path.html#path-comparison)。
 
+# message（待完善）
+
+Log a message.
+
+### General messages
+
+```
+message([<mode>] "message text" ...)
+```
+
+将指定的消息文本记录到日志中。如果提供了**多个消息字符串**，它们会被连接成一条消息，中间不会插入任何分隔符。
+
+可选的`<mode>`关键字用于指定消息的类型，它会影响消息被处理的方式：
+
+- `FATAL_ERROR`：CMake 错误，停止**处理**和**生成**。[`cmake(1)`](https://cmake.org/cmake/help/latest/manual/cmake.1.html#manual:cmake\(1\) "cmake(1)")可执行程序将返回一个非零[退出码](https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmake-exit-code)。
+- `STATUS`：项目使用者可能感兴趣的主要提示信息。理想情况下，这些信息应当简洁（最好不超过一行）。

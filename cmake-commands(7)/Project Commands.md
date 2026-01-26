@@ -8,10 +8,21 @@ These commands are available only in CMake projects.
 用于设置项目名称。
 
 ```
-project(<项目名>)
+project(<项目名> [<语言名>...])
 ```
 
 设置项目名称，并将其存储在变量`PROJECT_NAME`中。当从顶层`CMakeLists.txt`调用时，还会将项目名称存储在`CMAKE_PROJECT_NAME`变量中。
+
+同时还会设置下列变量：
+- [`PROJECT_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT_SOURCE_DIR.html#variable:PROJECT_SOURCE_DIR "PROJECT_SOURCE_DIR")、[`<PROJECT-NAME>_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT-NAME_SOURCE_DIR.html#variable:%3CPROJECT-NAME%3E_SOURCE_DIR "<PROJECT-NAME>_SOURCE_DIR")：项目源码目录的绝对路径。
+- [`PROJECT_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT_BINARY_DIR.html#variable:PROJECT_BINARY_DIR "PROJECT_BINARY_DIR")、[`<PROJECT-NAME>_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT-NAME_BINARY_DIR.html#variable:%3CPROJECT-NAME%3E_BINARY_DIR "<PROJECT-NAME>_BINARY_DIR")：项目二进制目录的绝对路径。即 CMake 生成构建文件的目录，如`build/`目录。
+- [`PROJECT_IS_TOP_LEVEL`](https://cmake.org/cmake/help/latest/variable/PROJECT_IS_TOP_LEVEL.html#variable:PROJECT_IS_TOP_LEVEL "PROJECT_IS_TOP_LEVEL")、[`<PROJECT-NAME>_IS_TOP_LEVEL`](https://cmake.org/cmake/help/latest/variable/PROJECT-NAME_IS_TOP_LEVEL.html#variable:%3CPROJECT-NAME%3E_IS_TOP_LEVEL "<PROJECT-NAME>_IS_TOP_LEVEL")：布尔值，表示该项目是否是最顶层项目。
+
+`<语言名>`用于==选择构建该项目所需的编程语言==。支持的语言包括：`C`, `CXX` (即 C++), `CSharp` (即 C#), `CUDA`, `OBJC` (即 Objective-C), `OBJCXX` (即 Objective-C++), `Fortran`, `HIP`, `ISPC`, `Swift`, `ASM`, `ASM_NASM`, `ASM_MARMASM`, `ASM_MASM`, `ASM-ATT`。
+
+如果启用`ASM`，请把它放在最后列出，这样 CMake 就可以检查其他语言（比如 C）的编译器是否同样可用于汇编。
+
+==如果没有给出任何语言选项，则默认启用`C`和`CXX`==。
 
 # add_executable
 
@@ -60,6 +71,28 @@ add_library(<名称> [<类型>] <源文件>...)
 
 2. 默认情况下，库文件会被创建在构建树中**与该 add_library 命令所在的源码树目录相对应**的目录下。要修改该位置，见[`ARCHIVE_OUTPUT_DIRECTORY`](https://cmake.org/cmake/help/latest/prop_tgt/ARCHIVE_OUTPUT_DIRECTORY.html#prop_tgt:ARCHIVE_OUTPUT_DIRECTORY "ARCHIVE_OUTPUT_DIRECTORY")、[`LIBRARY_OUTPUT_DIRECTORY`](https://cmake.org/cmake/help/latest/prop_tgt/LIBRARY_OUTPUT_DIRECTORY.html#prop_tgt:LIBRARY_OUTPUT_DIRECTORY "LIBRARY_OUTPUT_DIRECTORY")、[`RUNTIME_OUTPUT_DIRECTORY`](https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html#prop_tgt:RUNTIME_OUTPUT_DIRECTORY "RUNTIME_OUTPUT_DIRECTORY")。
 
+### Object Libraries
+
+```
+add_library(<名称> OBJECT <源文件>...)
+```
+
+> 注意：target 译为“目标”，object 译为“对象”。这里的 object 对应`.o`文件。
+
+添加一个[Object Library](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#object-libraries)：==只编译源文件，而不把编译后生成的对象文件打包或链接成真正的库==。
+
+由`add_library()`或`add_executable()`创建的其他目标，可以使用[`$<TARGET_OBJECTS:objlib>`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#genex:TARGET_OBJECTS "TARGET_OBJECTS")格式的表达式引用这些对象，将其作为源文件，其中`objlib`是 object library 的名称。例如：
+
+```
+add_library(... $<TARGET_OBJECTS:objlib> ...)
+add_executable(... $<TARGET_OBJECTS:objlib> ...)
+```
+
+上述写法会将`objlib`的`.o`文件包含到一个**库**和一个**可执行文件**中，与它们各自源文件编译生成的`.o`文件**一起链接**。对象库只能包括源文件、头文件，以及其他不会影响普通库链接的文件（例如 `.txt`）。它们可以包括生成此类源文件的自定义命令，但不能包括`PRE_BUILD`、`PRE_LINK`或`POST_BUILD`命令。某些原生构建系统（例如 Xcode）
+
+某些原生构建系统（例如[`Xcode`](https://cmake.org/cmake/help/latest/generator/Xcode.html#generator:Xcode "Xcode")）可能不喜欢只包含`.o`文件的目标，因此建议在任何引用[`$<TARGET_OBJECTS:objlib>`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#genex:TARGET_OBJECTS "TARGET_OBJECTS")的目标中至少添加一个真实的源文件。
+
+对象库可以通过`target_link_libraries()`进行链接。
 
 # add_subdirectory
 
